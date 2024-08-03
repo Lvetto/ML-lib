@@ -1,6 +1,6 @@
 from keras.datasets import mnist
 from matplotlib import pyplot as plt
-from lib import network
+from lib import *
 from keras.utils import to_categorical
 import numpy as np
 
@@ -18,15 +18,15 @@ test_labels = to_categorical(test_labels, num_classes=10)
 
 print("\n" * 10)
 
-net = network((784, 200, 10))
+net = supervised_learning((784, 200, 10), tanh_activation, mse_loss)
 
 losses = []
 
-losses = net.train(train_images, train_labels, 0.01, 200, 1, 5)
+losses = net.train(train_images, train_labels, 0.01, 400, 1, 5, "weights/mnist.dat")
 
 #net.load_weights("weights.dat")
 
-net.save_weights("final.dat")
+net.save_weights("weights/mnist.dat")
 
 n = 10
 indices = np.random.choice(test_images.shape[0], n * 4, replace=False)
