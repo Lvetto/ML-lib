@@ -107,7 +107,7 @@ class reinforcement_learning(supervised_learning):
     
     def train(self, initial_state, transition_function, reward, learning_rate, discount, epsilon, epochs, decay_rate=0.9):
         # the agent can move between states by making choices (represented as a confidence level vector that should approach the expected value for each in a given state)
-        # to train it, we give it an initial state and have him make a choice and simulate the outcome
+        # to train it, we give it an initial state and have it make a choice and simulate the outcome
         current_state = initial_state
         for epoch in range(epochs):
             # make a choice based on the current state and current weights
