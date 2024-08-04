@@ -1,8 +1,13 @@
 from keras.datasets import mnist
 from matplotlib import pyplot as plt
-from lib import *
 from keras.utils import to_categorical
 import numpy as np
+
+import sys
+import os
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_dir)
+from lib import *
 
 # Load MNIST dataset from keras and do some pre-processing
 (train_images, train_labels), (test_images, test_labels) = mnist.load_data()

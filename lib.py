@@ -2,6 +2,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from time import time
 import pickle
+from random import random
 
 class base_network:
     def __init__(self, layer_sizes, activations):
@@ -71,11 +72,13 @@ class supervised_learning(base_network):
         start_time = time()
         for epoch in range(epochs):
             total_loss = 0
+            # show the network all the inputs in the training set, then adjust the weights using the target outputs from the same set
             for input, target in zip(inputs, targets):
                 self.backpropagate(input, target, learning_rate)
                 total_loss += self.loss(self.layers[-1], target)
             losses.append(total_loss)
     
+            # periodically give updates with some useful info
             if (not epoch % update_interval):
                 progress = (epoch + 1) / epochs
                 time_taken = time() - start_time
@@ -83,13 +86,51 @@ class supervised_learning(base_network):
                 eta = ((time_taken / (epoch +1)) * epochs) - time_taken
                 print(f"Epoch: {epoch+1}, Progress: {progress * 100:.2f}%, Average loss: {avg_loss:.4f}, Time taken: {time_taken:.2f}s, Eta: {eta:.2f}s\r", end="")
             
+            # if a save path is given, periodically dump the weights into a file
             if (save_interval is not None and save_path is not None):
                 if (not epoch % save_interval):
                     self.save_weights("weights.dat")
+
         print("\n")
         return losses
 
-# used to pass a function toghether with its derivative when instantiating a network. Saves some parameters in the constructors
+class reinforcement_learning(supervised_learning):
+    def __init__(self, layer_sizes, activations, loss):
+        super().__init__(layer_sizes, activations, loss)
+
+    # make the wrong choice on purpose during training with probability epsilon to promote exploration
+    def choose_action(self, q, epsilon):
+        if random() < epsilon:
+            return np.random.choice(len(q))
+        else:
+            return np.argmax(q)
+    
+    def train(self, initial_state, transition_function, reward, learning_rate, discount, epsilon, epochs, decay_rate=0.9):
+        # the agent can move between states by making choices (represented as a confidence level vector that should approach the expected value for each in a given state)
+        # to train it, we give it an initial state and have him make a choice and simulate the outcome
+        current_state = initial_state
+        for epoch in range(epochs):
+            # make a choice based on the current state and current weights
+            q = self.compute(current_state)
+            choice = self.choose_action(q, epsilon) # sometimes we ignore it
+
+            # simulate the outcome and what the agent would do in the next state with the current weights
+            next_state = transition_function(current_state, choice)
+            q_next = self.compute(next_state)
+
+            # approximate target output using the Belmann equation
+            target = q.copy()
+            target[choice] = reward(current_state, choice) + discount * np.max(q_next)  # we only consider the component corresponding to the choice made to increase stability
+
+            # adjust the weights using backpropagation and advace to the next state
+            self.backpropagate(current_state, target, learning_rate)
+            current_state = next_state
+
+            # decrease randomness over time. More randomness helps with training time in the beginning, but is not needed later
+            epsilon *= decay_rate
+
+
+# used to pass a function toghether with its derivative when instantiating a network. Saves on some parameters in the constructors
 class FunctionWithDerivative:
     def __init__(self, func, derivative):
         self.func = func
@@ -182,6 +223,7 @@ def hinge_loss_derivative(output, target):
 hinge_loss_function = FunctionWithDerivative(hinge_loss, hinge_loss_derivative)
 
 
+# draw a network using a pyplot scatterplot. Not particularly useful anymore...
 def draw_network(net):
     layers = net.layers
     edges = net.edge_matrices

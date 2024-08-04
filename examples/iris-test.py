@@ -2,9 +2,14 @@ import numpy as np
 from sklearn.datasets import load_iris
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import OneHotEncoder
-from lib import *
 from matplotlib import pyplot as plt
 from numpy import tanh
+
+import sys
+import os
+parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+sys.path.append(parent_dir)
+from lib import *
 
 # load Iris dataset
 iris = load_iris()
