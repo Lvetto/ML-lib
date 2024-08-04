@@ -6,16 +6,16 @@ from lib import *
 from matplotlib import pyplot as plt
 from numpy import tanh
 
-# Carica il dataset Iris
+# load Iris dataset
 iris = load_iris()
 X = iris.data
 y = iris.target
 
-# One-hot encoding delle etichette
+# One-hot label encoding
 encoder = OneHotEncoder(sparse_output=False)
 y_one_hot = encoder.fit_transform(y.reshape(-1, 1))
 
-# Dividi il dataset in training e test
+# split dataset
 X_train, X_test, y_train, y_test = train_test_split(X, y_one_hot, test_size=0.2, random_state=42)
 
 net = supervised_learning((4, 4, 3), tanh_activation, mse_loss)

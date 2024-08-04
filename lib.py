@@ -5,15 +5,12 @@ import pickle
 
 class base_network:
     def __init__(self, layer_sizes, activation):
-        # Assign an activation function and its derivative. As a default tanh is used
+        # Assign an activation function and its derivative
         self.activation = activation
         
         # Initialize layer biases and weights
         self.biases = [np.random.rand(size) for size in layer_sizes[1:]]
-        self.weights = [
-            np.random.rand(layer_sizes[i], layer_sizes[i+1])
-            for i in range(len(layer_sizes) - 1)
-        ]
+        self.weights = [np.random.rand(layer_sizes[i], layer_sizes[i+1]) for i in range(len(layer_sizes) - 1)]
 
     def compute(self, input):
         # Ensure input is a numpy array
@@ -27,7 +24,7 @@ class base_network:
             z = self.layers[-1] @ weight + bias
             activation = self.activation(z)
             self.layers.append(activation)
-        
+
         return self.layers[-1]
 
     def save_weights(self, filename):

@@ -22,11 +22,20 @@ net = supervised_learning((784, 200, 10), tanh_activation, mse_loss)
 
 losses = []
 
-losses = net.train(train_images, train_labels, 0.01, 400, 1, 5, "weights/mnist.dat")
+net.load_weights("weights/mnist.dat")
 
-#net.load_weights("weights.dat")
+#losses = net.train(train_images, train_labels, 0.01, 400, 1, 5, "weights/mnist.dat")
 
-net.save_weights("weights/mnist.dat")
+#net.save_weights("weights/mnist.dat")
+
+correct = 0
+for x,y in zip(test_images, test_labels):
+    out = net.compute(x)
+    if (np.argmax(out) == np.argmax(y)):
+        correct += 1
+
+print(f"Accuracy: {(correct/len(test_images)) * 100:.2f}%")
+
 
 n = 10
 indices = np.random.choice(test_images.shape[0], n * 4, replace=False)
