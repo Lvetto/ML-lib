@@ -4,9 +4,13 @@ from time import time
 import pickle
 
 class base_network:
-    def __init__(self, layer_sizes, activation):
-        # Assign an activation function and its derivative
-        self.activation = activation
+    def __init__(self, layer_sizes, activations):
+        # Assign an activation functions and their derivatives
+        if (len(activations) != len(layer_sizes) -1):
+            self.activations = [activations[0]] * (len(layer_sizes) -1)
+            print("Wrong number of activation functions. Using the first one for each layer")
+        else:
+            self.activations = activations
         
         # Initialize layer biases and weights
         self.biases = [np.random.rand(size) for size in layer_sizes[1:]]
@@ -22,8 +26,8 @@ class base_network:
         # Forward pass through each layer
         for i, (weight, bias) in enumerate(zip(self.weights, self.biases)):
             z = self.layers[-1] @ weight + bias
-            activation = self.activation(z)
-            self.layers.append(activation)
+            z = self.activations[i](z)
+            self.layers.append(z)
 
         return self.layers[-1]
 
@@ -40,8 +44,8 @@ class base_network:
             self.biases = data['biases']
 
 class supervised_learning(base_network):
-    def __init__(self, layer_sizes, activation, loss):
-        super().__init__(layer_sizes, activation)
+    def __init__(self, layer_sizes, activations, loss):
+        super().__init__(layer_sizes, activations)
         self.loss = loss
     
     def backpropagate(self, input, target, learning_rate):
@@ -49,7 +53,7 @@ class supervised_learning(base_network):
         output = self.compute(input)
         
         # Calculate error for the output layer
-        output_error = self.loss.derivative(output, target) * self.activation.derivative(output)
+        output_error = self.loss.derivative(output, target) * self.activations[-1].derivative(output)
         
         # Initialize error list for each layer
         errors = [None] * len(self.layers)
@@ -58,7 +62,7 @@ class supervised_learning(base_network):
         # Compute derivatives and apply weight/biases corrections
         for l in reversed(range(len(self.weights))):
             # Update weights and biases
-            errors[l] = (errors[l + 1] @ self.weights[l].T) * self.activation.derivative(self.layers[l])
+            errors[l] = (errors[l + 1] @ self.weights[l].T) * self.activations[l].derivative(self.layers[l])
             self.weights[l] -= learning_rate * np.outer(self.layers[l], errors[l + 1])
             self.biases[l] -= learning_rate * errors[l + 1]
 

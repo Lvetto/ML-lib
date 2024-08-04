@@ -16,23 +16,25 @@ encoder = OneHotEncoder(sparse_output=False)
 y_one_hot = encoder.fit_transform(y.reshape(-1, 1))
 
 # split dataset
-X_train, X_test, y_train, y_test = train_test_split(X, y_one_hot, test_size=0.2, random_state=42)
+x_train, x_test, y_train, y_test = train_test_split(X, y_one_hot, test_size=0.2, random_state=42)
 
-net = supervised_learning((4, 4, 3), tanh_activation, mse_loss)
+act = FunctionWithDerivative(lambda x: np.tanh(x) + 1, tanh_derivative)
 
-losses = net.train(X_train, y_train, 0.1, 1000)
+net = supervised_learning((4, 4, 3), [tanh_activation, act], mse_loss)
 
-def evaluate(network, X_test, y_test):
+losses = net.train(x_train, y_train, 0.005, 500)
+
+def evaluate(network, x_test, y_test):
     correct = 0
     total = len(y_test)
-    for input, target in zip(X_test, y_test):
+    for input, target in zip(x_test, y_test):
         output = network.compute(input)
         if np.argmax(output) == np.argmax(target):
             correct += 1
     accuracy = correct / total
     print(f"Accuracy: {accuracy * 100:.2f}%")
 
-evaluate(net, X_test, y_test)
+evaluate(net, x_test, y_test)
 
 plt.plot(losses)
 plt.show()

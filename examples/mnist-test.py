@@ -18,7 +18,7 @@ test_labels = to_categorical(test_labels, num_classes=10)
 
 print("\n" * 10)
 
-net = supervised_learning((784, 200, 10), tanh_activation, mse_loss)
+net = supervised_learning((784, 200, 10), [tanh_activation], mse_loss)
 
 losses = []
 
