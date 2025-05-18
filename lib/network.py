@@ -6,10 +6,9 @@ class neural_network:
         # Assign an activation functions and their derivatives
         if (len(activations) != len(layer_sizes) -1):
             self.activations = [activations[0]] * (len(layer_sizes) -1)
-            print("Wrong number of activation functions. Using the first one for each layer")
         else:
             self.activations = activations
-        
+
         # Initialize layer biases and weights
         self.biases = [np.random.rand(size) for size in layer_sizes[1:]]
         self.weights = [np.random.rand(layer_sizes[i], layer_sizes[i+1]) for i in range(len(layer_sizes) - 1)]
@@ -17,10 +16,10 @@ class neural_network:
     def compute(self, input):
         # Ensure input is a numpy array
         input = np.array(input)
-        
+
         # Store values in the network layer by layer, starting from input
         self.layers = [input]
-        
+
         # Forward pass through each layer
         for i, (weight, bias) in enumerate(zip(self.weights, self.biases)):
             z = self.layers[-1] @ weight + bias

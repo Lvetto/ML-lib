@@ -1,13 +1,13 @@
 import numpy as np
 from time import time
-from lib.network import base_network
+from lib.network import *
 
 
-class supervised_learning(base_network):
+class supervised_learning(neural_network):
     def __init__(self, layer_sizes, activations, loss):
         super().__init__(layer_sizes, activations)
         self.loss = loss
-    
+
     def backpropagate(self, input, target, learning_rate):
         # Forward pass
         output = self.compute(input)
@@ -36,7 +36,7 @@ class supervised_learning(base_network):
                 self.backpropagate(input, target, learning_rate)
                 total_loss += self.loss(self.layers[-1], target)
             losses.append(total_loss)
-    
+  
             # periodically give updates with some useful info
             if (not epoch % update_interval):
                 progress = (epoch + 1) / epochs
@@ -44,7 +44,7 @@ class supervised_learning(base_network):
                 avg_loss = total_loss / len(inputs)
                 eta = ((time_taken / (epoch +1)) * epochs) - time_taken
                 print(f"Epoch: {epoch+1}, Progress: {progress * 100:.2f}%, Average loss: {avg_loss:.4f}, Time taken: {time_taken:.2f}s, Eta: {eta:.2f}s\r", end="")
-            
+        
             # if a save path is given, periodically dump the weights into a file
             if (save_interval is not None and save_path is not None):
                 if (not epoch % save_interval):
